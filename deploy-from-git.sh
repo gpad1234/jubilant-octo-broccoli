@@ -54,17 +54,35 @@ BACKEND_DIR="$BACKEND_DIR"
 GIT_REPO="$GIT_REPO"
 
 echo "📁 Creating application directory..."
-mkdir -p "\$APP_DIR"
-cd "\$APP_DIR"
-
-echo "📥 Cloning or updating git repository..."
-if [ -d ".git" ]; then
-    # Already cloned, just update
-    git fetch origin
-    git reset --hard origin/main
-    echo "✅ Repository updated"
+# If app directory exists with old structure, backup and remove it
+if [ -d "\$APP_DIR/.git" ]; then
+    echo "   Detected existing repository..."
+    cd "\$APP_DIR"
+    
+    # Try to update first
+    git fetch origin 2>/dev/null || true
+    
+    # Check if we're on main branch and can update
+    if git branch -r | grep -q origin/main; then
+        echo "   Cleaning and resetting to latest..."
+        git clean -fd
+        git reset --hard origin/main
+        echo "✅ Repository cleaned and updated"
+    else
+        # If branch doesn't exist, do a complete re-clone
+        cd ..
+        echo "   Doing complete re-clone (old structure detected)..."
+        rm -rf "\$APP_DIR"
+        mkdir -p "\$APP_DIR"
+        cd "\$APP_DIR"
+        git clone "\$GIT_REPO" .
+        echo "✅ Repository cloned fresh"
+    fi
 else
-    # First time clone
+    # First time - create and clone
+    mkdir -p "\$APP_DIR"
+    cd "\$APP_DIR"
+    echo "📥 Cloning git repository..."
     git clone "\$GIT_REPO" .
     echo "✅ Repository cloned"
 fi
