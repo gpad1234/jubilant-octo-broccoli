@@ -6,6 +6,7 @@ import customerRoutes from './routes/customers.js';
 import dealRoutes from './routes/deals.js';
 import taskRoutes from './routes/tasks.js';
 import activityRoutes from './routes/activities.js';
+import aiRoutes from './routes/ai.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +29,7 @@ const startServer = async () => {
     app.use('/api/deals', dealRoutes);
     app.use('/api/tasks', taskRoutes);
     app.use('/api/activities', activityRoutes);
+    app.use('/api/ai', aiRoutes);
 
     // Health check
     app.get('/api/health', (req, res) => {

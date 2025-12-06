@@ -85,6 +85,8 @@ export const initializeDatabase = () => {
 
 export const getDatabase = () => db;
 
+export const getDb = () => db;
+
 // Helper functions for database operations
 export const dbRun = (sql, params = []) => {
   return new Promise((resolve, reject) => {

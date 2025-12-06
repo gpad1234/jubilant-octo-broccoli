@@ -1,45 +1,67 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
+// Error handling utility
+const handleResponse = async (response, errorMessage) => {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || errorMessage);
+  }
+  return response.json();
+};
+
+// Request helper with retry logic
+const fetchWithRetry = async (url, options = {}, maxRetries = 2) => {
+  let lastError;
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      const response = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', ...options.headers },
+        ...options,
+      });
+      return response;
+    } catch (err) {
+      lastError = err;
+      if (i < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+  }
+  throw lastError;
+};
 
 // Customers API
 export const customersAPI = {
   getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/customers`);
-    if (!response.ok) throw new Error('Failed to fetch customers');
-    return response.json();
+    const response = await fetchWithRetry(`${API_BASE_URL}/customers`);
+    return handleResponse(response, 'Failed to fetch customers');
   },
 
   getById: async (id) => {
-    const response = await fetch(`${API_BASE_URL}/customers/${id}`);
-    if (!response.ok) throw new Error('Failed to fetch customer');
-    return response.json();
+    const response = await fetchWithRetry(`${API_BASE_URL}/customers/${id}`);
+    return handleResponse(response, 'Failed to fetch customer');
   },
 
   create: async (data) => {
-    const response = await fetch(`${API_BASE_URL}/customers`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/customers`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to create customer');
-    return response.json();
+    return handleResponse(response, 'Failed to create customer');
   },
 
   update: async (id, data) => {
-    const response = await fetch(`${API_BASE_URL}/customers/${id}`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/customers/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to update customer');
-    return response.json();
+    return handleResponse(response, 'Failed to update customer');
   },
 
   delete: async (id) => {
-    const response = await fetch(`${API_BASE_URL}/customers/${id}`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/customers/${id}`, {
       method: 'DELETE',
     });
-    if (!response.ok) throw new Error('Failed to delete customer');
-    return response.json();
+    return handleResponse(response, 'Failed to delete customer');
   },
 };
 
@@ -49,85 +71,72 @@ export const dealsAPI = {
     const response = await fetch(`${API_BASE_URL}/deals`);
     if (!response.ok) throw new Error('Failed to fetch deals');
     return response.json();
+// Deals API
+export const dealsAPI = {
+  getAll: async () => {
+    const response = await fetchWithRetry(`${API_BASE_URL}/deals`);
+    return handleResponse(response, 'Failed to fetch deals');
   },
 
   getByStage: async (stage) => {
-    const response = await fetch(`${API_BASE_URL}/deals/stage/${stage}`);
-    if (!response.ok) throw new Error('Failed to fetch deals');
-    return response.json();
+    const response = await fetchWithRetry(`${API_BASE_URL}/deals/stage/${stage}`);
+    return handleResponse(response, 'Failed to fetch deals');
   },
 
   create: async (data) => {
-    const response = await fetch(`${API_BASE_URL}/deals`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/deals`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to create deal');
-    return response.json();
+    return handleResponse(response, 'Failed to create deal');
   },
 
   update: async (id, data) => {
-    const response = await fetch(`${API_BASE_URL}/deals/${id}`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/deals/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to update deal');
-    return response.json();
+    return handleResponse(response, 'Failed to update deal');
   },
 
   delete: async (id) => {
-    const response = await fetch(`${API_BASE_URL}/deals/${id}`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/deals/${id}`, {
       method: 'DELETE',
     });
-    if (!response.ok) throw new Error('Failed to delete deal');
-    return response.json();
-  },
-};
-
-// Tasks API
-export const tasksAPI = {
-  getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/tasks`);
+    return handleResponse(response, 'Failed to delete deal');
+  },const response = await fetch(`${API_BASE_URL}/tasks`);
     if (!response.ok) throw new Error('Failed to fetch tasks');
     return response.json();
   },
+// Tasks API
+export const tasksAPI = {
+  getAll: async () => {
+    const response = await fetchWithRetry(`${API_BASE_URL}/tasks`);
+    return handleResponse(response, 'Failed to fetch tasks');
+  },
 
   create: async (data) => {
-    const response = await fetch(`${API_BASE_URL}/tasks`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/tasks`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to create task');
-    return response.json();
+    return handleResponse(response, 'Failed to create task');
   },
 
   update: async (id, data) => {
-    const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/tasks/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to update task');
-    return response.json();
+    return handleResponse(response, 'Failed to update task');
   },
 
   delete: async (id) => {
-    const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/tasks/${id}`, {
       method: 'DELETE',
     });
-    if (!response.ok) throw new Error('Failed to delete task');
-    return response.json();
-  },
-};
-
-// Activities API
-export const activitiesAPI = {
-  getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/activities`);
-    if (!response.ok) throw new Error('Failed to fetch activities');
+    return handleResponse(response, 'Failed to delete task');
+  },if (!response.ok) throw new Error('Failed to fetch activities');
     return response.json();
   },
 
@@ -136,8 +145,41 @@ export const activitiesAPI = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
+// Activities API
+export const activitiesAPI = {
+  getAll: async () => {
+    const response = await fetchWithRetry(`${API_BASE_URL}/activities`);
+    return handleResponse(response, 'Failed to fetch activities');
+  },
+
+  create: async (data) => {
+    const response = await fetchWithRetry(`${API_BASE_URL}/activities`, {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to create activity');
-    return response.json();
+    return handleResponse(response, 'Failed to create activity');
+  },
+};
+
+// AI Insights API
+export const aiAPI = {
+  getCustomerInsights: async (customerId) => {
+    const response = await fetchWithRetry(`${API_BASE_URL}/ai/customer-insights/${customerId}`);
+    return handleResponse(response, 'Failed to generate customer insights');
+  },
+
+  getDealRecommendations: async () => {
+    const response = await fetchWithRetry(`${API_BASE_URL}/ai/deal-recommendations`);
+    return handleResponse(response, 'Failed to generate deal recommendations');
+  },
+
+  getPipelineAnalysis: async () => {
+    const response = await fetchWithRetry(`${API_BASE_URL}/ai/pipeline-analysis`);
+    return handleResponse(response, 'Failed to analyze pipeline');
+  },
+
+  getNextSteps: async (customerId) => {
+    const response = await fetchWithRetry(`${API_BASE_URL}/ai/next-steps/${customerId}`);
+    return handleResponse(response, 'Failed to generate next steps');
   },
 };
