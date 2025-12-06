@@ -68,12 +68,6 @@ export const customersAPI = {
 // Deals API
 export const dealsAPI = {
   getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/deals`);
-    if (!response.ok) throw new Error('Failed to fetch deals');
-    return response.json();
-// Deals API
-export const dealsAPI = {
-  getAll: async () => {
     const response = await fetchWithRetry(`${API_BASE_URL}/deals`);
     return handleResponse(response, 'Failed to fetch deals');
   },
@@ -104,10 +98,9 @@ export const dealsAPI = {
       method: 'DELETE',
     });
     return handleResponse(response, 'Failed to delete deal');
-  },const response = await fetch(`${API_BASE_URL}/tasks`);
-    if (!response.ok) throw new Error('Failed to fetch tasks');
-    return response.json();
   },
+};
+
 // Tasks API
 export const tasksAPI = {
   getAll: async () => {
@@ -136,15 +129,9 @@ export const tasksAPI = {
       method: 'DELETE',
     });
     return handleResponse(response, 'Failed to delete task');
-  },if (!response.ok) throw new Error('Failed to fetch activities');
-    return response.json();
   },
+};
 
-  create: async (data) => {
-    const response = await fetch(`${API_BASE_URL}/activities`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
 // Activities API
 export const activitiesAPI = {
   getAll: async () => {
