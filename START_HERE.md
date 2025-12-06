@@ -57,6 +57,34 @@ Make sure:
 
 ---
 
+## 🔐 SSH Authentication
+
+The deployment scripts use SSH. You have two options:
+
+### Option 1: Password (Current - Simplest)
+Just enter your password when the script asks.
+```bash
+./quick-deploy.sh
+# When prompted: enter root password
+```
+
+### Option 2: SSH Keys (No Password - Recommended)
+One-time setup for passwordless deployment:
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ""
+cat ~/.ssh/id_ed25519.pub | ssh root@165.232.54.109 "cat >> ~/.ssh/authorized_keys"
+```
+
+Then deploy without password:
+```bash
+./quick-deploy.sh
+# No password needed!
+```
+
+📖 **See `SSH_AUTHENTICATION.md` for detailed setup and troubleshooting**
+
+---
+
 ## 🚀 Deploy Now!
 
 Pick one command and run it:
