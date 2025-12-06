@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Brain, Zap, TrendingUp, AlertCircle } from 'lucide-react';
+import { Brain, Zap, TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
 import { aiAPI } from '../api/api';
 
 const AIInsights = ({ customerId, deals = [], isOpen = true }) => {
@@ -32,16 +32,30 @@ const AIInsights = ({ customerId, deals = [], isOpen = true }) => {
   if (loading) {
     return (
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-        <div className="flex items-center gap-2 text-indigo-600 font-semibold">
-          <Brain className="w-5 h-5 animate-spin" />
-          AI Insights Loading...
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-indigo-600 font-semibold">
+            <Brain className="w-5 h-5 animate-spin" />
+            AI Insights Loading...
+          </div>
+          <button disabled className="text-indigo-400 cursor-not-allowed">
+            <RefreshCw className="w-5 h-5" />
+          </button>
+  if (error) {
+    return (
+      <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+        <div className="flex items-center justify-between">
+          <p className="text-red-600 text-sm">Failed to load insights</p>
+          <button
+            onClick={loadInsights}
+            className="text-red-600 hover:text-red-700 transition"
+            title="Retry"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
         </div>
       </div>
     );
-  }
-
-  if (error) {
-    return (
+  } return (
       <div className="bg-red-50 rounded-lg p-4 border border-red-200">
         <p className="text-red-600 text-sm">Failed to load insights</p>
       </div>
@@ -68,16 +82,25 @@ const AIInsights = ({ customerId, deals = [], isOpen = true }) => {
       case 'critical':
         return 'text-red-700 bg-red-100';
       case 'high':
-        return 'text-orange-700 bg-orange-100';
-      case 'medium':
-        return 'text-yellow-700 bg-yellow-100';
-      default:
-        return 'text-green-700 bg-green-100';
-    }
-  };
-
-  return (
     <div className={`rounded-lg p-4 border ${getRiskColor(insights.riskLevel)}`}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Brain className="w-5 h-5 text-indigo-600" />
+          <h3 className="font-semibold text-gray-800">AI Insights</h3>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={`text-xs px-2 py-1 rounded font-semibold ${getRiskBgColor(insights.riskLevel)}`}>
+            {insights.riskLevel.charAt(0).toUpperCase() + insights.riskLevel.slice(1)} Risk
+          </span>
+          <button
+            onClick={loadInsights}
+            className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded p-1 transition"
+            title="Refresh insights"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
+      </div>ssName={`rounded-lg p-4 border ${getRiskColor(insights.riskLevel)}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Brain className="w-5 h-5 text-indigo-600" />
