@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Brain, Zap, TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
+import { Brain, Zap, AlertTriangle, RefreshCw } from 'lucide-react';
 import { aiAPI } from '../api/api';
 
-const AIInsights = ({ customerId, deals = [], isOpen = true }) => {
+const AIInsights = ({ customerId, deals = [], isOpen = false }) => {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (customerId && isOpen) {
+    if (isOpen && customerId) {
       loadInsights();
     }
   }, [customerId, isOpen]);
@@ -27,22 +27,29 @@ const AIInsights = ({ customerId, deals = [], isOpen = true }) => {
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+      <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-indigo-600 font-semibold">
+          <div className="flex items-center gap-2 text-blue-600">
             <Brain className="w-5 h-5 animate-spin" />
-            AI Insights Loading...
+            <span>Analyzing customer data...</span>
           </div>
-          <button disabled className="text-indigo-400 cursor-not-allowed">
+          <button disabled className="text-blue-400 cursor-not-allowed">
             <RefreshCw className="w-5 h-5" />
           </button>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
-      <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+      <div className="bg-red-50 rounded-lg p-6 border border-red-200">
         <div className="flex items-center justify-between">
           <p className="text-red-600 text-sm">Failed to load insights</p>
           <button
@@ -55,96 +62,96 @@ const AIInsights = ({ customerId, deals = [], isOpen = true }) => {
         </div>
       </div>
     );
-  } return (
-      <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-        <p className="text-red-600 text-sm">Failed to load insights</p>
-      </div>
-    );
   }
 
-  if (!insights) return null;
+  if (!insights) {
+    return null;
+  }
 
-  const getRiskColor = (risk) => {
-    switch (risk) {
+  const getRiskColor = (level) => {
+    switch (level?.toLowerCase()) {
       case 'critical':
-        return 'bg-red-50 border-red-200';
+        return 'bg-red-100 text-red-800 border-red-300';
       case 'high':
-        return 'bg-orange-50 border-orange-200';
+        return 'bg-orange-100 text-orange-800 border-orange-300';
       case 'medium':
-        return 'bg-yellow-50 border-yellow-200';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
       default:
-        return 'bg-green-50 border-green-200';
+        return 'bg-green-100 text-green-800 border-green-300';
     }
   };
 
-  const getRiskBgColor = (risk) => {
-    switch (risk) {
-      case 'critical':
-        return 'text-red-700 bg-red-100';
-      case 'high':
-    <div className={`rounded-lg p-4 border ${getRiskColor(insights.riskLevel)}`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5 text-indigo-600" />
-          <h3 className="font-semibold text-gray-800">AI Insights</h3>
+  return (
+    <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Brain className="w-6 h-6 text-purple-600" />
+          <h3 className="text-lg font-semibold text-gray-900">AI Insights</h3>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={`text-xs px-2 py-1 rounded font-semibold ${getRiskBgColor(insights.riskLevel)}`}>
-            {insights.riskLevel.charAt(0).toUpperCase() + insights.riskLevel.slice(1)} Risk
-          </span>
-          <button
-            onClick={loadInsights}
-            className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded p-1 transition"
-            title="Refresh insights"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-        </div>
-      </div>ssName={`rounded-lg p-4 border ${getRiskColor(insights.riskLevel)}`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5 text-indigo-600" />
-          <h3 className="font-semibold text-gray-800">AI Insights</h3>
-        </div>
-        <span className={`text-xs px-2 py-1 rounded font-semibold ${getRiskBgColor(insights.riskLevel)}`}>
-          {insights.riskLevel.charAt(0).toUpperCase() + insights.riskLevel.slice(1)} Risk
-        </span>
+        <button
+          onClick={loadInsights}
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded transition"
+          title="Refresh insights"
+        >
+          <RefreshCw className="w-5 h-5" />
+        </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-white rounded p-3">
-          <p className="text-xs text-gray-600">Total Deal Value</p>
-          <p className="text-lg font-semibold text-gray-900">
-            ${(insights.metrics.totalDealValue / 1000).toFixed(0)}K
-          </p>
+      {/* Risk Level Badge */}
+      <div className={`rounded-full inline-block px-4 py-2 font-semibold border ${getRiskColor(insights.riskLevel)}`}>
+        Risk Level: {insights.riskLevel}
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg p-4 border border-gray-200">
+          <p className="text-gray-600 text-sm mb-1">Total Deal Value</p>
+          <p className="text-2xl font-bold text-gray-900">${insights.totalDealValue?.toLocaleString()}</p>
         </div>
-        <div className="bg-white rounded p-3">
-          <p className="text-xs text-gray-600">Active Deals</p>
-          <p className="text-lg font-semibold text-gray-900">{insights.metrics.activeDeals}</p>
+        <div className="bg-white rounded-lg p-4 border border-gray-200">
+          <p className="text-gray-600 text-sm mb-1">Active Deals</p>
+          <p className="text-2xl font-bold text-gray-900">{insights.activeDeals}</p>
         </div>
-        <div className="bg-white rounded p-3">
-          <p className="text-xs text-gray-600">Closed Deals</p>
-          <p className="text-lg font-semibold text-gray-900">{insights.metrics.closedDeals}</p>
+        <div className="bg-white rounded-lg p-4 border border-gray-200">
+          <p className="text-gray-600 text-sm mb-1">Engagement Score</p>
+          <p className="text-2xl font-bold text-gray-900">{insights.engagementScore}/100</p>
         </div>
-        <div className="bg-white rounded p-3">
-          <p className="text-xs text-gray-600">Lifetime Value</p>
-          <p className="text-lg font-semibold text-gray-900">
-            ${(insights.metrics.lifetimeValue / 1000).toFixed(0)}K
-          </p>
+        <div className="bg-white rounded-lg p-4 border border-gray-200">
+          <p className="text-gray-600 text-sm mb-1">Interactions</p>
+          <p className="text-2xl font-bold text-gray-900">{insights.interactions}</p>
         </div>
       </div>
 
+      {/* Recommendations */}
       {insights.recommendations && insights.recommendations.length > 0 && (
-        <div className="bg-white rounded p-3">
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className="w-4 h-4 text-amber-500" />
-            <p className="text-sm font-semibold text-gray-800">Recommendations</p>
+        <div className="bg-white rounded-lg p-4 border border-gray-200">
+          <div className="flex items-center gap-2 mb-3">
+            <Zap className="w-5 h-5 text-yellow-500" />
+            <h4 className="font-semibold text-gray-900">Recommendations</h4>
           </div>
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {insights.recommendations.map((rec, idx) => (
-              <li key={idx} className="text-xs text-gray-700 flex gap-2">
-                <span className="text-amber-500">•</span>
-                {rec}
+              <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                <span className="text-purple-500 font-bold mt-1">→</span>
+                <span>{rec}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Warning Flags */}
+      {insights.warningFlags && insights.warningFlags.length > 0 && (
+        <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-5 h-5 text-red-600" />
+            <h4 className="font-semibold text-red-900">Action Required</h4>
+          </div>
+          <ul className="space-y-2">
+            {insights.warningFlags.map((flag, idx) => (
+              <li key={idx} className="text-sm text-red-800 flex items-start gap-2">
+                <span className="font-bold mt-1">⚠</span>
+                <span>{flag}</span>
               </li>
             ))}
           </ul>
