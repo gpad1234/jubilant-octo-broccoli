@@ -80,10 +80,20 @@ echo "✅ Frontend built"
 echo "📦 Installing backend dependencies..."
 cd "\$BACKEND_DIR"
 npm install --production
-cd "\$APP_DIR"
 echo "✅ Backend dependencies installed"
 
+# Return to app directory
+cd "\$APP_DIR"
+
 echo "📝 Setting up nginx configuration..."
+if [ ! -f "nginx-crm.conf" ]; then
+    echo "❌ nginx-crm.conf not found in \$APP_DIR"
+    echo "   Current directory: \$(pwd)"
+    echo "   Files in directory:"
+    ls -la
+    exit 1
+fi
+
 sudo cp nginx-crm.conf /etc/nginx/sites-available/crm
 sudo ln -sf /etc/nginx/sites-available/crm /etc/nginx/sites-enabled/crm
 
@@ -95,6 +105,12 @@ fi
 echo "✅ Nginx configuration valid"
 
 echo "📝 Setting up backend service..."
+if [ ! -f "crm-backend.service" ]; then
+    echo "❌ crm-backend.service not found in \$APP_DIR"
+    echo "   Current directory: \$(pwd)"
+    exit 1
+fi
+
 sudo cp crm-backend.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable crm-backend
