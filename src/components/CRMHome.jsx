@@ -5,6 +5,7 @@ import DealsPipeline from './DealsPipeline';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import ContactForm from './ContactForm';
 import CustomersList from './CustomersList';
+import DealRecommendations from './DealRecommendations';
 import { customersAPI, activitiesAPI, tasksAPI } from '../api/api';
 
 const CRMHome = () => {
@@ -201,6 +202,12 @@ const CRMHome = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* AI Deal Recommendations */}
+              <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">AI Insights</h2>
+                <DealRecommendations />
+              </div>
+
               {/* Recent Activities */}
               <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6 border-b border-gray-200">

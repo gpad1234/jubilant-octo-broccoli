@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Mail, Phone, MapPin, Building, Calendar, DollarSign, Edit, Trash2, Plus, MoreVertical, FileText, Clock, TrendingUp } from 'lucide-react';
+import AIInsights from './AIInsights';
 
 const CustomerDetail = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -144,6 +145,8 @@ const CustomerDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* AI Insights */}
+            <AIInsights customerId={customer.id} deals={deals} isOpen={true} />
             {activeTab === 'overview' && (
               <>
                 {/* Quick Stats */}

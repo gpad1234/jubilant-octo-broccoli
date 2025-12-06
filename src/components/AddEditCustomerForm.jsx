@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Save, X, AlertCircle } from 'lucide-react';
+import { validators, validateForm as validateFormUtil, hasErrors } from '../utils/validation';
 
 const AddEditCustomerForm = ({ onClose, onSave, customer = null }) => {
   const [formData, setFormData] = useState({
@@ -17,24 +18,34 @@ const AddEditCustomerForm = ({ onClose, onSave, customer = null }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const industries = ['Technology', 'Finance', 'Healthcare', 'Retail', 'Manufacturing', 'Other'];
   const statuses = ['prospect', 'lead', 'customer', 'inactive'];
 
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
-    }
-    if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
-    if (!formData.company.trim()) newErrors.company = 'Company is required';
+  // Validation schema using the validators utility
+  const validationSchema = {
+    name: [
+      (val) => validators.required(val, 'Name'),
+      (val) => validators.minLength(val, 2, 'Name'),
+    ],
+    email: [
+      (val) => validators.required(val, 'Email'),
+      (val) => validators.email(val),
+    ],
+    phone: [
+      (val) => validators.required(val, 'Phone'),
+      (val) => validators.phone(val),
+    ],
+    company: [
+      (val) => validators.required(val, 'Company'),
+    ],
+  };
 
+  const validateForm = () => {
+    const newErrors = validateFormUtil(formData, validationSchema);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return !hasErrors(newErrors);
   };
 
   const handleChange = (e) => {
@@ -55,7 +66,12 @@ const AddEditCustomerForm = ({ onClose, onSave, customer = null }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      onSave(formData);
+      setIsSubmitting(true);
+      try {
+        onSave(formData);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
