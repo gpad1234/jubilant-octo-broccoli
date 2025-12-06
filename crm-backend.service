@@ -1,0 +1,28 @@
+[Unit]
+Description=CRM Backend API Service
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/crm-app/backend
+ExecStart=/usr/bin/node /var/www/crm-app/backend/server.js
+Restart=on-failure
+RestartSec=10
+
+# Environment variables
+Environment="NODE_ENV=production"
+Environment="PORT=5000"
+Environment="DATABASE_URL=/var/www/crm-app/backend/crm.db"
+
+# Process limits
+LimitNOFILE=65535
+LimitNPROC=512
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=crm-backend
+
+[Install]
+WantedBy=multi-user.target
